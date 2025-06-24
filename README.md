@@ -43,4 +43,4 @@ Laporan ini mencakup proses import data, data wrangling, visualisasi, dan insigh
 
 ## Kontak
 Jika tertarik dengan proyek ini atau ingin berdiskusi:  
-📧 hidayatramdan808@email.com | 🌐 [LinkedIn]([https://linkedin.com/in/namamu](https://www.linkedin.com/in/dadan-ramdan-hidayat-381789316/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)
+📧 hidayatramdan808@email.com | 🌐 [LinkedIn](https://www.linkedin.com/in/dadan-ramdan-hidayat-381789316/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)
