@@ -1,85 +1,115 @@
 ---
-  title: "Laporan Analisis Penjualan"  
-author: "Dadan Ramdan Hidayat (52240028)"  
-date: "`r format(Sys.Date(), '%B %d, %Y')`"  
+title: "Laporan Analisis Penjualan"
+author: "Dadan Ramdan Hidayat (52240028)"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
   html_document:
-  theme: flatly
-toc: true
-toc_float: true
-code_folding: hide
-number_sections: true
-highlight: tango 
-df_print: paged
-css: "stylee.css"
+    theme: flatly
+    toc: true
+    toc_float: true
+    code_folding: hide
+    number_sections: true
+    highlight: tango
+    df_print: paged
+    css: "stylee.css"
 ---
+
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(lubridate)
 library(ggplot2)
-````
+library(data.table)
+library(lubridate)
+library(DT)
 
-## 📌 Tujuan Analisis
+```
+
+## Tujuan Analisis
 
 Menganalisis performa penjualan dari sebuah e-commerce selama 6 bulan terakhir berdasarkan data transaksi yang telah dibersihkan melalui proses data wrangling.
 
-## 📥 Import & Gabungkan Data
+## Import & Gabungkan Data
 
-```{r}
-# Baca semua file dari folder data
-file_list <- list.files("data", pattern = "*.csv", full.names = TRUE)
-data_penjualan <- file_list %>%
-  map_dfr(read_csv)
 
-# Format tanggal dan bersihkan
-data_penjualan <- data_penjualan %>%
-  mutate(
-    tanggal_transaksi = as.Date(tanggal_transaksi),
-    bulan = month(tanggal_transaksi, label = TRUE, abbr = FALSE)
-  ) %>%
-  drop_na() %>%
-  distinct()
+```{r, message=FALSE, warning=FALSE}
+library(data.table)
+library(lubridate)
 
-glimpse(data_penjualan)
+# 1. Ambil semua file CSV
+folder_path <- "C:/Users/ASUS/OneDrive/Dokumen/4. Proyek/7. GitHub/Dadan-Ramdan-Hidayat-main"
+file_list <- list.files(path = folder_path, pattern = "^penjualan_.*\\.csv$", full.names = TRUE)
+
+# 2. Gabungkan semua file jadi satu data.table
+dt <- rbindlist(lapply(file_list, function(file) fread(file)), fill = TRUE)
+
+# 3. Normalisasi nama kolom
+setnames(dt, tolower(gsub(" ", "_", names(dt))))
+
+# 4. Format tanggal dan buat kolom bulan
+dt[, tanggal_transaksi := as.IDate(tanggal_transaksi)]
+dt[, bulan := lubridate::month(tanggal_transaksi, label = TRUE, abbr = FALSE)]
+
+# 5. Hapus NA dan duplikat
+dt <- na.omit(dt)
+dt <- unique(dt)
+
+# 6. Lihat ringkasan
+
+DT::datatable(dt,
+              caption = "📊 Data Penjualan Gabungan",
+              options = list(pageLength = 10))
+
+
 ```
 
-## 📊 Statistik Deskriptif
+## Statistik Deskriptif
 
-```{r}
-# Total transaksi dan total penjualan
-data_penjualan %>%
-  summarise(
-    total_transaksi = n(),
-    total_penjualan = sum(total_penjualan)
-  )
+```{r, message=FALSE, warning=FALSE}
+# Hitung total transaksi dan total penjualan
+summary_dt <- dt[, .(
+  total_transaksi = .N,
+  total_penjualan = sum(total_penjualan)
+)]
+
+# Tampilkan sebagai tabel interaktif
+DT::datatable(summary_dt,
+              caption = "📋 Ringkasan Total Transaksi dan Penjualan",
+              options = list(pageLength = 5))
+
 ```
 
-## 📈 Visualisasi Penjualan per Bulan
+## Visualisasi Penjualan per Bulan
 
-```{r}
-data_penjualan %>%
-  group_by(bulan) %>%
-  summarise(total = sum(total_penjualan)) %>%
-  ggplot(aes(x = bulan, y = total)) +
+```{r, message=FALSE, warning=FALSE}
+# Hitung total penjualan per bulan
+monthly_sales <- dt[, .(total = sum(total_penjualan)), by = bulan]
+
+# Gunakan ggplot2 untuk visualisasi
+library(ggplot2)
+ggplot(monthly_sales, aes(x = bulan, y = total)) +
   geom_col(fill = "steelblue") +
   labs(title = "Total Penjualan per Bulan", x = "Bulan", y = "Total Penjualan (Rp)") +
   theme_minimal()
+
 ```
 
-## 🛒 Produk Terlaris
+## Produk Terlaris
 
-```{r}
-data_penjualan %>%
-  group_by(produk) %>%
-  summarise(total = sum(total_penjualan)) %>%
-  arrange(desc(total)) %>%
-  head(5)
+```{r, message=FALSE, warning=FALSE}
+# 5 Produk dengan total penjualan tertinggi
+produk_terlaris <- dt[, .(total = sum(total_penjualan)), by = produk][
+  order(-total)][1:5]
+
+# Tampilkan dalam tabel interaktif
+DT::datatable(produk_terlaris,
+              caption = "🏆 5 Produk Terlaris Berdasarkan Total Penjualan",
+              options = list(pageLength = 5))
+
 ```
 
-## 🧠 Insight Awal
+## Insight Awal
 
 * Penjualan tertinggi terjadi di bulan tertentu (lihat grafik).
 * Produk paling laris adalah produk dengan total penjualan terbesar.
 * Kategori tertentu mungkin mendominasi kontribusi penjualan (bisa dianalisis lebih lanjut).
 
-```
