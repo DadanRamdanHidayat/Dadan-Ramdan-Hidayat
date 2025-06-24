@@ -1,8 +1,18 @@
 ---
-title: "Laporan Analisis Penjualan E-Commerce"
-output: html_document
+  title: "Laporan Analisis Penjualan"  
+author: "Dadan Ramdan Hidayat (52240028)"  
+date: "`r format(Sys.Date(), '%B %d, %Y')`"  
+output:
+  html_document:
+  theme: flatly
+toc: true
+toc_float: true
+code_folding: hide
+number_sections: true
+highlight: tango 
+df_print: paged
+css: "stylee.css"
 ---
-
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(lubridate)
