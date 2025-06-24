@@ -35,4 +35,4 @@ Proyek ini bertujuan untuk menganalisis performa penjualan dari sebuah perusahaa
 
 ## 📬 Kontak
 Jika tertarik dengan proyek ini atau ingin berdiskusi:  
-📧 dadan@email.com | 🌐 [LinkedIn](https://linkedin.com/in/namamu)
+📧 hidayatramdan808@email.com | 🌐 [LinkedIn]([https://linkedin.com/in/namamu](https://www.linkedin.com/in/dadan-ramdan-hidayat-381789316/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app))
