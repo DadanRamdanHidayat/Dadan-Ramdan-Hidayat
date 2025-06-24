@@ -21,7 +21,7 @@ Proyek ini bertujuan untuk menganalisis performa penjualan dari sebuah perusahaa
 
 Analisis penjualan e-commerce selama 6 bulan menggunakan data transaksi.
 
-🔗 [Lihat laporan lengkap di RPubs]([https://rpubs.com/namakamu/analisis-penjualan](https://rpubs.com/Ramdan/1324993))
+🔗 [Lihat laporan lengkap di RPubs] (https://rpubs.com/Ramdan/1324993)
 
 ## Deskripsi
 Laporan ini mencakup proses import data, data wrangling, visualisasi, dan insight berdasarkan total penjualan tiap bulan dan produk terlaris.
