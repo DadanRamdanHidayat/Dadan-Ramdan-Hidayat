@@ -81,17 +81,71 @@ DT::datatable(summary_dt,
 ## Visualisasi Penjualan per Bulan
 
 ```{r, message=FALSE, warning=FALSE}
-# Hitung total penjualan per bulan
-monthly_sales <- dt[, .(total = sum(total_penjualan)), by = bulan]
+library(data.table)
+library(lubridate)
+library(plotly)
+library(viridis)
 
-# Gunakan ggplot2 untuk visualisasi
-library(ggplot2)
-ggplot(monthly_sales, aes(x = bulan, y = total)) +
-  geom_col(fill = "steelblue") +
-  labs(title = "Total Penjualan per Bulan", x = "Bulan", y = "Total Penjualan (Rp)") +
-  theme_minimal()
+# Pastikan kolom 'bulan' tersedia
+if (!"bulan" %in% names(dt)) {
+  dt[, bulan := lubridate::month(tanggal_transaksi, label = TRUE, abbr = FALSE)]
+}
+
+# Agregasi total penjualan per bulan
+penjualan_bulanan <- dt[, .(
+  total_penjualan = sum(total_penjualan, na.rm = TRUE)
+), by = bulan]
+
+# Urutkan bulan
+penjualan_bulanan <- penjualan_bulanan[order(bulan)]
+
+# Buat warna turbo berdasarkan jumlah bulan
+bulan_order <- as.character(penjualan_bulanan$bulan)
+bulan_colors <- setNames(
+  viridis::turbo(length(bulan_order), alpha = 0.95, direction = -1),
+  bulan_order
+)
+
+# Tambahkan warna ke data
+penjualan_bulanan[, warna := bulan_colors[as.character(bulan)]]
+
+# Plot interaktif dengan warna turbo
+plot_ly(
+  data = penjualan_bulanan,
+  x = ~bulan,
+  y = ~total_penjualan,
+  type = 'bar',
+  marker = list(color = ~warna),
+  text = ~paste("Total: ", scales::comma(total_penjualan)),
+  hoverinfo = 'text'
+) %>%
+  layout(
+    title = "Total Penjualan per Bulan",
+    xaxis = list(title = "Bulan"),
+    yaxis = list(title = "Total Penjualan"),
+    showlegend = FALSE
+  )
+
 
 ```
+### **Grafik Penjualan Bulanan**
+
+Grafik ini menunjukkan total penjualan per bulan selama periode Januari hingga Juni dalam satu tahun, yang diilustrasikan dengan batang berwarna interaktif dan efek turbo untuk menambah daya tarik visual. Data ini memberikan gambaran mengenai tren dan fluktuasi penjualan yang terjadi selama setengah tahun terakhir.
+
+Dari grafik tersebut, dapat disimpulkan bahwa:
+
+ - **Bulan Mei mencatatkan penjualan tertinggi**, dengan total sekitar 1,8 miliar, menunjukkan adanya momentum positif atau kampanye pemasaran yang efektif pada bulan tersebut.
+ 
+ - **Bulan Maret juga menunjukkan kinerja yang baik**, dengan total penjualan sekitar 1,58 miliar, menempatkannya sebagai bulan dengan penjualan tertinggi kedua.
+ 
+ - Sebaliknya, **bulan Februari mengalami penurunan** penjualan relatif cukup signifikan dibanding bulan Januari dan Maret, yakni sekitar 1,35 miliar.
+ 
+ - **Penjualan terendah terjadi di bulan Februari**, menunjukkan adanya kemungkinan faktor musiman, ekonomi, atau strategi pemasaran yang kurang optimal pada bulan tersebut.
+ 
+ - Setelah puncak di bulan Mei, terjadi penurunan pada bulan Juni ke angka sekitar 1,66 miliar, meskipun tetap menunjukkan performa yang cukup stabil.
+
+Secara keseluruhan, grafik ini menunjukkan tren peningkatan penjualan dari Januari ke Maret, diikuti oleh fluktuasi dengan puncaknya di Mei. Hal ini penting untuk menjadi dasar evaluasi strategi penjualan dan pemasaran, serta untuk mengidentifikasi faktor-faktor yang mempengaruhi kenaikan dan penurunan penjualan di bulan-bulan tertentu.
+
 
 ## Produk Terlaris
 
@@ -106,10 +160,49 @@ DT::datatable(produk_terlaris,
               options = list(pageLength = 5))
 
 ```
+### **Analisis Produk Terlaris**
 
-## Insight Awal
+Tabel ini menyajikan daftar lima produk terlaris berdasarkan jumlah penjualan total sepanjang periode yang diamati. Data ini penting untuk memahami produk mana yang paling diminati oleh konsumen dan memberikan panduan strategis dalam pengelolaan inventaris dan pemasaran.
 
-* Penjualan tertinggi terjadi di bulan tertentu (lihat grafik).
-* Produk paling laris adalah produk dengan total penjualan terbesar.
-* Kategori tertentu mungkin mendominasi kontribusi penjualan (bisa dianalisis lebih lanjut).
+Dari tabel terlihat bahwa:
+
+ - **Smartphone** menempati posisi teratas dengan total penjualan mencapai 1.810.666.404 unit, menunjukkan bahwa produk ini paling diminati dan menjadi pendorong utama pendapatan perusahaan.
+ 
+ - **TV** berada di posisi kedua dengan total penjualan sekitar 1.645.333.270 unit, yang menunjukkan tingginya permintaan terhadap perangkat elektronik ini.
+ 
+ - **Laptop** dan **Tablet** masing-masing mencatat penjualan yang sangat tinggi, dengan total sekitar 1.507.654.430 dan 1.505.997.784 unit, mengindikasikan bahwa perangkat portable dan gadget menjadi pilihan utama konsumen.
+ 
+ - **Kamera** berada di posisi kelima dengan total penjualan sekitar 1.444.403.603 unit, masih menunjukkan minat yang cukup besar terhadap produk ini.
+
+Kesimpulan utama dari data ini adalah bahwa perangkat elektronik seperti smartphone, TV, laptop, dan tablet mendominasi pasar, dengan smartphone sebagai produk terlaris utama. Hal ini menandakan adanya peluang untuk fokus pada strategi pemasaran produk-produk ini guna meningkatkan penjualan dan memperkuat posisi pasar.
+
+
+### **Insight Strategis Berdasarkan Data Penjualan**
+
+Berdasarkan data penjualan bulanan dan produk terlaris, dapat disimpulkan bahwa:
+
+1. **Tren Penjualan Bulanan:**
+   - Penjualan menunjukkan tren meningkat dari Januari hingga bulan Mei, dengan puncaknya di bulan Mei mencapai total sekitar **1.804.150.092** unit. Setelah itu, penjualan menurun sedikit pada bulan Juni menjadi **1.656.262.138** unit. Tren ini mengindikasikan adanya faktor musiman atau keberhasilan kampanye penjualan khusus di bulan Mei.
+   - Fluktuasi performa ini menegaskan pentingnya pengelompokan strategi penjualan berdasarkan waktu tertentu dan perlunya analisis mendalam terkait faktor-faktor yang mempengaruhi fluktuasi ini, seperti promosi, peluncuran produk baru, atau tren pasar.
+
+2. **Produk Terlaris:**
+   - Produk dengan penjualan tertinggi adalah **Smartphone**, sebanyak **1.810.666.404** unit. Posisi kedua ditempati oleh **TV** dengan total **1.645.333.270** unit, diikuti oleh **Laptop** sebanyak **1.507.654.430** unit, dan **Tablet** dengan **1.505.997.784** unit. Produk **Kamera** berada di posisi kelima dengan penjualan **1.444.403.603** unit.
+   - Hal ini menunjukkan bahwa pasar sangat tertarik pada perangkat elektronik portable dan gadget, terutama smartphone, yang menjadi kontributor utama terhadap total penjualan perusahaan.
+
+3. **Hubungan Antara Penjualan Bulanan dan Produk:**
+   - Peningkatan penjualan di bulan Mei kemungkinan didukung oleh keberhasilan penjualan produk-produk utama tersebut, terutama smartphone dan perangkat portabel lainnya. Kemungkinan besar terdapat promosi besar, peluncuran produk, atau diskon tertentu yang dilakukan di bulan tersebut.
+   - Penurunan di bulan Juni sebesar sekitar 148 juta unit (dari 1.804 juta menjadi 1.656 juta) menunjukkan perlunya evaluasi terkait faktor eksternal, seperti tren musiman, persaingan pasar, atau faktor ekonomi yang mempengaruhi daya beli konsumen.
+
+4. **Peluang dan Tantangan:**
+   - **Peluang** utama adalah memperkuat strategi pemasaran produk-produk terlaris, mengoptimalkan inventaris, dan inovasi produk agar tetap bersaing.
+   - **Tantangan** termasuk menjaga kestabilan penjualan di luar masa puncak, serta mengantisipasi faktor eksternal seperti fluktuasi ekonomi dan perubahan preferensi pelanggan.
+
+### **Rekomendasi Strategis**
+
+- Fokus pada promosi dan penguatan penjualan produk smartphone, yang memimpin penjualan dengan total **1.810.666.404** unit, terutama pada periode di luar musim puncak, untuk menjaga kestabilan volume penjualan.
+- Melakukan analisis pasar secara berkala untuk menyesuaikan penawaran produk yang sesuai tren dan kebutuhan konsumen, termasuk menambah varian produk baru.
+- Mengelola stok secara dinamis berdasarkan tren bulanan agar tidak terjadi kekurangan saat penjualan meningkat dan kelebihan saat penjualan menurun.
+- Melaksanakan evaluasi terhadap faktor eksternal yang mempengaruhi performa, seperti kampanye promosi dan pameran teknologi.
+- Menetapkan target penjualan berdasarkan data historis dan tren penjualan saat ini, dengan perencanaan ambisius namun realistis.
+
 
