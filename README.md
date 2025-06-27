@@ -17,7 +17,7 @@ Proyek ini bertujuan untuk menganalisis performa penjualan dari sebuah perusahaa
 - ggplot2 / plotly
 - R Markdown
 
-# 📊 Laporan Analisis Penjualan E-Commerce
+# Laporan Analisis Penjualan E-Commerce
 
 Analisis penjualan e-commerce selama 6 bulan menggunakan data transaksi.
 
@@ -37,9 +37,6 @@ Laporan ini mencakup proses import data, data wrangling, visualisasi, dan insigh
 - Tren penjualan per bulan
 - Produk dan kategori terlaris
 - Kontribusi tiap kategori terhadap total penjualan
-
-## Insight (Contoh)
-> Penjualan tertinggi terjadi di bulan Maret, didorong oleh kategori Elektronik. Produk dengan kontribusi terbesar adalah Smartphone XYZ.
 
 ## Kontak
 Jika tertarik dengan proyek ini atau ingin berdiskusi:  
